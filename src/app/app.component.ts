@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +7,12 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'AngularCouse';
+
+  // initial
+  loadedPage = 'recipe';
+
+  onNavigate(pageName:string){
+    this.loadedPage = pageName;
+  }
+
 }
