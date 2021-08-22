@@ -1,0 +1,98 @@
+~~學習~~
+
+20210818 ( 進度 17)
+
+1. Angular 有許多 feature,但要使用他們,需要在
+app.module.ts 裡面 import , 並且在下方的 NgModule imports 屬性添加
+ex : ngModel 屬性 屬於 FormsModule, 就需引入並添加。
+
+2. main.ts 是主要執行的 ts , 裡面 import 了 AppModule 並啟動。
+app.module.ts 裡面的啟動相關項目，指定了 AppComponent。
+angular 啟動時去讀取並產生相關 javascript,
+是讓 angular 能夠互動響應的主因。
+
+
+
+20210822 ( 進度 50)
+
+1. @NgModule 是 AppModule 的裝飾器
+declarations、imports、providers、bootstrap
+
+declaration 有點像是 spring 的 @ComponentScan, 光是定義還不夠，app 不會知道你有這個 component
+透過 import 後放在 declaration 裡面，才可以使用到他
+
+imports : 放其他 module 的地方，如果要用到寫好的 module 或是同一個 app 拆分成多個 module 要使用
+就要放在這裡。
+
+providers > service 相關
+
+2. @Component , template 是必要的
+template vs templateUrl
+template    : 允許直接寫 html code
+templateUrl : 指向某個 .html 檔案
+
+styleUrls 可指向多個 .css file
+styles: [...(css)...] 直接寫在 component.ts 上
+
+selector : 概念類似 css 選擇器  以 app-test 為例子
+
+selector : '<app-test>'  >  <app-test> in html ( 元素 )
+selector : '[app-test]'  >  <div app-test> in html ( 屬性 )
+selector : '.app-test'   >  <div class="app-test"> in html ( class )
+
+3. data binding
+讓 typeScript 和 template 溝通的方式
+
+output data
+1. string interpolation ( 插值 ) : {{ data }}
+> 最後會轉成 string , 所以也可以寫一些簡單的表示式或呼叫有回傳值的方法 ( 能轉string就可以 )
+( 但不能做 if
+2. property binding : [property] = "data"
+
+react to (User) events
+1. event binding : (event)="expression"
+可以傳入 ($event) 取得 事件相關資料，ts function 在 參數位置放上 event:any 來接
+
+two-way-binding ( FormsModule needed !)
+1. [(ngModel)] = "data"
+
+4. directives
+Dom 的操作說明, 指的是放在這裡的 appTurnGreen ( 範例 )
+html : <p appTurnGreen> Receives a green background! </p>
+ts :
+@Directive({
+  selector: '[appTurnGreen]'
+})
+export class TurnGreenDirective{
+  ...
+}
+
+Angular 提供之常見 directives : ( 以 * 開頭代表式結構式指令, 會去動到 dom 的結構 )
+1. *ngIf :
+ts : serverCreated = true;
+<p *ngIf="serverCreated ( 或回傳 boolean 的方法 ) "> Server is created ! </p>
+
+用以下方式做到 if/else 顯示元素
+<p *ngIf="serverCreated; else noServer "> Server is created ! </p>
+<ng-template #noServer>
+  <p> No server !</p>
+</ng-template>
+
+2. ngStyle : 動態改變元素 style ( attribute directives 不須加* )
+搭配 property binding 一起使用傳入 js 物件, 亦可傳入方法
+<p [ngStyle]="{backgroundColor:'red'}"> serverTest </p>
+
+3. ngClass : 動態改變元素 class ( attribute directives 不須加* )
+搭配 property binding 一起使用傳入 js 物件, 亦可傳入方法
+<p [ngClass]="{online: serverStatus === 'online'}"></p>
+
+4. ngFor : 執行迴圈 ( structural directives 須加* )
+<p *ngFor="let server of servers"> {{ server.name }} </p>
+
+取得 index
+<p *ngFor="let server of servers; let i = index">
+  {{ i }}
+</p>
+
+5. ng g c component --skipTests true  =>  可以不產生 xxx.spec.ts 測試檔案
+
