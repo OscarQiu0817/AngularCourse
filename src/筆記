@@ -96,3 +96,134 @@ ts : serverCreated = true;
 
 5. ng g c component --skipTests true  =>  可以不產生 xxx.spec.ts 測試檔案
 
+
+20210823 ( 進度 63 : 大部分在製作畫面 & Component )
+
+1. sourceMap > 讓 browser/main.bundle.js 直接連到對應 .ts 檔案。
+
+20210824 ( 進度 86 )
+
+1. by default, all properties of components are only accessible inside these components,
+not from outside.
+
+2. 如果要讓屬性可以被外面取用( 賦值 )，那麼在屬性前須加上 @Input() 裝飾器,
+代表可接收外面傳進來的參數。
+
+Alias 別名 : @Input( 'alias' ) element ...
+傳入時，使用 [alias]=...  , [element] 將失去作用
+
+3. Binding to Custom Events
+
+範例 :
+<app-test (serverCreated)="onServerAdded($event)"></app-test>
+
+serverCreated 需要定義在 app-test.component.ts 當中
+宣告為 EventEmitter 讓他可以發送事件觸發器，
+並且透過 @Output() 屬性讓外面的 Component 接收 ( 讓外面的人知道這裡會有事件發送 )
+
+@OutPut() serverCreated = new EventEmitter<>();  // <> 裡面放要傳入的物件。
+
+onAddServer(){
+  this.serverCreated.emit(); // 如果上面有定義要傳出去的物件，這裡就要放進去。
+}
+
+Alias 別名 : @OutPut( 'alias' ) serverCreated ...
+傳入時，使用 (alias)=...  , (serverCreated) 將失去作用
+
+4. view encapsulation
+
+Angular 透過給予屬性做到不同 component 之間的 css 不會互相影響，
+可以在 @Component 新增 encapsulation: ViewEncapsulation.None
+停止這個預設行為，這樣 css 的設定就都會吃到。
+ViewEncapsulation.Emulated => 預設Angular 實現
+ViewEncapsulation.ShadowDom => 只在支援此技術的瀏覽器實現
+
+5.Using Local References in Templates
+在 template 給予元素一個暫時的 ref，不必在component 裡面定義。
+範例 :
+<input type="text" #serverNameInput>
+<button (click)="onAddServer(serverNameInput)">Add</button>
+
+6. @ViewChild
+不一定要透過事件傳入才能在 component 裡面拿到物件，透過 @ViewChild 裝飾器
+在事件觸發之前就可以拿到
+
+範例 :
+template
+<input type="text" #serverContentInput>
+
+component.ts
+@ViewChild('serverContentInput',{static:true}) serverContentInput : ElementRef;
+
+console.log( this.serverContentInput.nativeElement.value );
+
+7. ng-content
+如果寫在 <app-xxx>...</app-xxx>裡面，...會不見。
+但如果在 app-xxx.component.ts 裡面加上
+<ng-content></ng-content> ， 那麼 ... 的內容會出現在 ng-content 的位置。
+
+8. ngOnInit()
+lifecycle
+
+9. @ContentChild('...',{static:true})
+ng-content 傳進來的東西可以用這個拿到。
+
+app.component.ts :
+
+  <app-server>
+    <p #contentP>
+      ...
+    </p>
+  </app-server>
+
+server.component.html :
+<ng-content></ng-content>
+
+透過 @ContentChild
+server.component.ts 可以拿到 p 的內容。 ( 在 ngOnContentInit 觸發之後 )
+
+service 預習 : 107~111
+
+service 放在 construtor 裡面 讓他自己產生一個。
+
+how to inform Angular how to create ?
+
+1. 在 @Component ({... , providers: [XxxService] })
+=> 在元件中提供服務，會限定該服務只能在該元件及其子元件中有效，而同一模組中的其它元件不能訪問它
+=> 但子元件中若自己又在 providers 定義相同服務，會創建一個自己的instance ( override )
+層級 :
+AppModule > AppComponent > other Component
+
+2.直接在 service 上加上 @Injectable 並設定，會把這個類別標記為依賴注入系統的參與者之一
+providedIn: 'root' 表示 service 在整個應用程式中都是可見的
+就不用每次用到的時候都去寫一次 providers。
+
+範例 :
+@Injectable({
+  providedIn: 'root',
+})
+export class xxxService{}
+
+另外如果要注入 service 到 另一個 service ， @Injectable 也是必要的。
+( 加在要被注入的那邊 )
+ex : 注入 LogService to AccountService, AccountService 需要加上 @Injectable
+( 新版的 angular ， 這個屬性變成是必要的，只要是 service 都會有 )
+
+routing 預習 : 123 ~ 127
+
+const appRoutes: Routes = [];
+
+@NgModule imports
+ // 加上這個只是可以用 router 相關，但實際註冊是靠後面的 .forRoot
+ RouterModule.forRoot(appRoutes)
+
+template :
+<router-outlet></router-outlet>
+
+routerLink :
+<a routerLink="/recipe">
+<a [routerLink]="'/recipe'"> // 接 字串
+<a [routerLink]="['/shopping-list']" > // 接 陣列
+
+form 預習 :
+
