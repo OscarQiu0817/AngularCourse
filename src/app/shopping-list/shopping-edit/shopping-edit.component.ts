@@ -19,7 +19,7 @@ export class ShoppingEditComponent implements OnInit {
   }
 
   onAddClick(){
-
+    // const 不可變常數
     const newIngredient = new Ingredient(
       this.nameInputRef.nativeElement.value,
       this.amountInputRef.nativeElement.value );

@@ -12,7 +12,7 @@ angular 啟動時去讀取並產生相關 javascript,
 是讓 angular 能夠互動響應的主因。
 
 
-
+-----------------------------------------------------------------------------------
 20210822 ( 進度 50)
 
 1. @NgModule 是 AppModule 的裝飾器
@@ -96,11 +96,13 @@ ts : serverCreated = true;
 
 5. ng g c component --skipTests true  =>  可以不產生 xxx.spec.ts 測試檔案
 
-
+-----------------------------------------------------------------------------------
 20210823 ( 進度 63 : 大部分在製作畫面 & Component )
 
 1. sourceMap > 讓 browser/main.bundle.js 直接連到對應 .ts 檔案。
 
+
+-----------------------------------------------------------------------------------
 20210824 ( 進度 86 )
 
 1. by default, all properties of components are only accessible inside these components,
@@ -184,7 +186,7 @@ server.component.ts 可以拿到 p 的內容。 ( 在 ngOnContentInit 觸發之�
 
 service 預習 : 107~111
 
-service 放在 construtor 裡面 讓他自己產生一個。
+service 放在 constructor 裡面 讓他自己產生一個。
 
 how to inform Angular how to create ?
 
@@ -225,5 +227,59 @@ routerLink :
 <a [routerLink]="'/recipe'"> // 接 字串
 <a [routerLink]="['/shopping-list']" > // 接 陣列
 
+-----------------------------------------------------------------------------------
+20210829 ( 進度 99 )
+
+1. 在同一個元素上只允許"一個"結構式指令
+
+2. custom directives
+
+範例:
+
+@Directive({
+  selector: '[appBasic]'
+})
+export class BasicDirective implements OnInit{
+  constructor(elementRef : ElementRef){}
+
+  ngOnInit(){
+    this.elementRef.nativeElement.style.backgroundColor = 'green';
+  }
+}
+
+two things to do :
+a. inform Angular that is a new directive ( in app.module.ts : declarations: [ BasicDirective ])
+b. <p appBasic> Style with my directive !</p>
+
+但這種直接修改 dom 元素的作法可能會有一些問題，例如在一些執行環境下不允許直接存取dom元素，
+可以改用 angular 提供的工具 : Renderer2 來做
+
+constructor(private elRef: ElementRef , private renderer: Renderer2){}
+
+ngOnInit(){
+  this.renderer.setStyle(this.elRef.nativeElement, 'background-color', 'blue');
+}
+
+3. @HostListener 監聽事件 in directive 例如 : hover 、 mouseover ...
+
+@HostListener('mouseenter') mouseover(eventData: Event){
+  // do something...
+}
+
+3. @HostBinding 寫在屬性之前，將此屬性跟 dom 元素的屬性綁定
+
+@HostBinding('style.backgroundColor') backgroundColor: string;
+
+func(){
+  this.backgroundColor = 'blue';
+}
+
+4. 也可以搭配 @Input 使用，做到動態改變的效果。( 父元件傳入 )
+
+
 form 預習 :
 
+Template-Driven  vs  Reactive
+
+TD : 在 html 寫好，由 angular 轉成需要的形式
+R  : 定義在 .ts 檔案 和 html 裡面，連結兩者做到更細微的控制
